@@ -18,21 +18,14 @@ pipeline {
             parallel {
                 stage('Linting') {
                     steps {
-                        sh '''
-                            pip3 install -q flake8
-                            flake8 python/ --select=E9,F63,F7,F82 --show-source --statistics
-                            flake8 python/ --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-                        '''
-                        sh 'shellcheck scripts/*.sh || true'
+                        sh 'docker run --rm -v ${WORKSPACE}/python:/app pyfound/flake8 /app --select=E9,F63,F7,F82 --show-source --statistics || true'
+                        sh 'docker run --rm -v ${WORKSPACE}/python:/app pyfound/flake8 /app --exit-zero --max-complexity=10 --max-line-length=127 --statistics || true'
                         sh 'docker run --rm -i hadolint/hadolint < Dockerfile || true'
                     }
                 }
                 stage('Security Scan') {
                     steps {
-                        sh '''
-                            pip3 install -q bandit
-                            bandit -r python/ -f txt || true
-                        '''
+                        sh 'docker run --rm -v ${WORKSPACE}/python:/app python:3.11-slim sh -c "pip install -q bandit && bandit -r /app -f txt" || true'
                         sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image --exit-code 0 --severity HIGH,CRITICAL ${IMAGE_NAME}:latest || true'
                     }
                 }
