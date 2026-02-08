@@ -19,7 +19,7 @@ pipeline {
                 stage('Linting') {
                     steps {
                         sh '''
-                            pip install -q flake8
+                            pip3 install -q flake8
                             flake8 python/ --select=E9,F63,F7,F82 --show-source --statistics
                             flake8 python/ --exit-zero --max-complexity=10 --max-line-length=127 --statistics
                         '''
@@ -30,7 +30,7 @@ pipeline {
                 stage('Security Scan') {
                     steps {
                         sh '''
-                            pip install -q bandit
+                            pip3 install -q bandit
                             bandit -r python/ -f txt || true
                         '''
                         sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image --exit-code 0 --severity HIGH,CRITICAL ${IMAGE_NAME}:latest || true'
