@@ -20,12 +20,11 @@ pipeline {
                     steps {
                         echo 'Running Flake8 linting...'
                         sh '''
-                            pip install flake8 --quiet
-                            flake8 python/ --max-line-length=120 --ignore=E501,W503 || true
+                            docker run --rm -v "${WORKSPACE}":/app -w /app python:3.11-slim sh -c "pip install flake8 --quiet && flake8 python/ --max-line-length=120 --ignore=E501,W503" || true
                         '''
                         echo 'Running Hadolint for Dockerfile...'
                         sh '''
-                            hadolint Dockerfile || true
+                            docker run --rm -i hadolint/hadolint < Dockerfile || true
                         '''
                         echo 'Linting completed!'
                     }
@@ -34,12 +33,11 @@ pipeline {
                     steps {
                         echo 'Running Bandit for Python security...'
                         sh '''
-                            pip install bandit --quiet
-                            bandit -r python/ -f txt || true
+                            docker run --rm -v "${WORKSPACE}":/app -w /app python:3.11-slim sh -c "pip install bandit --quiet && bandit -r python/ -f txt" || true
                         '''
                         echo 'Running Trivy security scan...'
                         sh '''
-                            trivy fs --severity HIGH,CRITICAL --exit-code 0 .
+                            docker run --rm -v "${WORKSPACE}":/app aquasec/trivy:latest fs --severity HIGH,CRITICAL --exit-code 0 /app
                         '''
                         echo 'Security scan completed!'
                     }
