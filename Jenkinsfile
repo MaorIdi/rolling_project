@@ -19,17 +19,28 @@ pipeline {
                 stage('Linting') {
                     steps {
                         echo 'Running Flake8 linting...'
-                        echo 'Checking Python code quality...'
-                        echo 'Running ShellCheck...'
+                        sh '''
+                            pip install flake8 --quiet
+                            flake8 python/ --max-line-length=120 --ignore=E501,W503 || true
+                        '''
                         echo 'Running Hadolint for Dockerfile...'
-                        echo 'Linting completed successfully!'
+                        sh '''
+                            hadolint Dockerfile || true
+                        '''
+                        echo 'Linting completed!'
                     }
                 }
                 stage('Security Scan') {
                     steps {
-                        echo 'Running Trivy security scan...'
-                        echo 'Scanning Docker image for vulnerabilities...'
                         echo 'Running Bandit for Python security...'
+                        sh '''
+                            pip install bandit --quiet
+                            bandit -r python/ -f txt || true
+                        '''
+                        echo 'Running Trivy security scan...'
+                        sh '''
+                            trivy fs --severity HIGH,CRITICAL --exit-code 0 .
+                        '''
                         echo 'Security scan completed!'
                     }
                 }
