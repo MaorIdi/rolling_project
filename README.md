@@ -2,6 +2,13 @@
 
 A Flask-based web application that provides a real-time dashboard for viewing AWS resources in your account. The application displays EC2 instances, VPCs, Load Balancers, and AMIs in an organized, easy-to-read format.
 
+[![Python](https://img.shields.io/badge/Python-3.11-blue.svg)](https://python.org)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://docker.com)
+[![Terraform](https://img.shields.io/badge/Terraform-IaC-purple.svg)](https://terraform.io)
+[![Jenkins](https://img.shields.io/badge/Jenkins-CI%2FCD-red.svg)](https://jenkins.io)
+
+📖 **[View Full Documentation](https://maoridi.github.io/rolling_project/)**
+
 ## 🚀 Features
 
 - **EC2 Instances**: View instance ID, state, type, and public IP address
@@ -14,18 +21,22 @@ A Flask-based web application that provides a real-time dashboard for viewing AW
 ## 📋 Prerequisites
 
 - Python 3.7 or higher
+- Docker (for containerized deployment)
 - AWS Account with appropriate permissions
-- AWS credentials configured
+- Terraform (for infrastructure provisioning)
+- Jenkins (for CI/CD pipeline)
 
 ## 🛠️ Installation
 
 1. **Clone the repository**
+
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/MaorIdi/rolling_project.git
    cd rolling_project
    ```
 
 2. **Navigate to the Python directory**
+
    ```bash
    cd python
    ```
@@ -39,12 +50,12 @@ A Flask-based web application that provides a real-time dashboard for viewing AW
 
 ### AWS Credentials Setup
 
-You need to configure AWS credentials using environment variables. Create a `.env` file or set the following environment variables:
+You need to configure AWS credentials using environment variables:
 
 ```bash
 export AWS_ACCESS_KEY_ID="your-access-key-id"
 export AWS_SECRET_ACCESS_KEY="your-secret-access-key"
-export AWS_REGION="your-preferred-region"  # e.g., us-east-1, eu-west-1
+export AWS_REGION="us-east-1"
 ```
 
 ### Required AWS Permissions
@@ -53,50 +64,140 @@ Your AWS user/role must have the following permissions:
 
 ```json
 {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:DescribeInstances",
-                "ec2:DescribeVpcs",
-                "ec2:DescribeImages",
-                "elbv2:DescribeLoadBalancers"
-            ],
-            "Resource": "*"
-        }
-    ]
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeInstances",
+        "ec2:DescribeVpcs",
+        "ec2:DescribeImages",
+        "elbv2:DescribeLoadBalancers"
+      ],
+      "Resource": "*"
+    }
+  ]
 }
 ```
 
 ## 🏃‍♂️ Running the Application
 
-1. **Set your AWS credentials** (if not already done):
-   ```bash
-   export AWS_ACCESS_KEY_ID="your-access-key-id"
-   export AWS_SECRET_ACCESS_KEY="your-secret-access-key"
-   export AWS_REGION="us-east-1"
-   ```
+### Option 1: Run Locally
 
-2. **Start the Flask application**:
-   ```bash
-   python app.py
-   ```
+```bash
+cd python
+python app.py
+```
 
-3. **Access the dashboard**:
-   Open your web browser and navigate to: `http://localhost:5001`
+Access the dashboard at: `http://localhost:5001`
+
+### Option 2: Run with Docker
+
+```bash
+# Build the image
+docker build -t flask-aws-monitor .
+
+# Run the container
+docker run -d -p 5001:5001 \
+  -e AWS_ACCESS_KEY_ID="your-access-key" \
+  -e AWS_SECRET_ACCESS_KEY="your-secret-key" \
+  -e AWS_REGION="us-east-1" \
+  flask-aws-monitor
+```
+
+### Option 3: Use Pre-built Docker Hub Image
+
+```bash
+docker run -d -p 5001:5001 \
+  -e AWS_ACCESS_KEY_ID="your-access-key" \
+  -e AWS_SECRET_ACCESS_KEY="your-secret-key" \
+  -e AWS_REGION="us-east-1" \
+  maoridi/rolling-project:latest
+```
+
+## 🐳 Docker
+
+The application is containerized for easy deployment:
+
+```bash
+# Build locally
+docker build -t flask-aws-monitor .
+
+# Or pull from Docker Hub
+docker pull maoridi/rolling-project:latest
+```
+
+## 🏗️ Terraform Infrastructure
+
+The `terraform/` directory contains Infrastructure as Code for provisioning AWS resources:
+
+```bash
+cd terraform
+
+# Initialize Terraform
+terraform init
+
+# Preview changes
+terraform plan
+
+# Apply configuration
+terraform apply
+```
+
+### Resources Created
+
+- **EC2 Instance**: Builder instance (t3.medium) with Docker
+- **Security Group**: SSH (22) and App (5001) access
+- **Key Pair**: Auto-generated SSH key for instance access
+
+### Configuration
+
+Update `terraform/variables.tf` with your values:
+
+- `vpc_id`: Your VPC ID
+- `public_subnet_id`: Your public subnet ID
+- `my_ip`: Your public IP (run `curl ifconfig.me`)
+
+## 🔄 CI/CD Pipeline
+
+The Jenkins pipeline automates the build and deployment process.
+
+### Pipeline Stages
+
+| Stage              | Description                                    |
+| ------------------ | ---------------------------------------------- |
+| Clone Repository   | Clones the GitHub repository                   |
+| Linting            | Runs Flake8 (Python) and Hadolint (Dockerfile) |
+| Security Scan      | Runs Bandit (Python) and Trivy (filesystem)    |
+| Build Docker Image | Builds the Docker image                        |
+| Push to Docker Hub | Pushes image to registry                       |
+
+### Jenkins Setup
+
+1. Install Jenkins on your Builder EC2 instance
+2. Add DockerHub credentials:
+   - `dockerhub-username` (Secret text)
+   - `dockerhub-password` (Secret text)
+3. Create a Pipeline job pointing to this repository
 
 ## 📁 Project Structure
 
 ```
 rolling_project/
-├── aws/
-│   ├── my_aws_ec2.png          # AWS EC2 screenshot/reference
-│   └── rolling_project_web.png # Web application screenshot
-├── python/
-│   ├── app.py                  # Main Flask application
-│   └── requirements.txt        # Python dependencies
-└── README.md                   # This file
+├── aws/                    # AWS documentation/screenshots
+├── docs/                   # GitHub Pages documentation
+│   └── index.html
+├── python/                 # Flask application
+│   ├── app.py              # Main application
+│   └── requirements.txt    # Python dependencies
+├── terraform/              # Infrastructure as Code
+│   ├── main.tf             # Main Terraform config
+│   ├── variables.tf        # Input variables
+│   ├── outputs.tf          # Output values
+│   └── provider.tf         # AWS provider config
+├── Dockerfile              # Docker build instructions
+├── Jenkinsfile             # CI/CD pipeline definition
+└── README.md               # This file
 ```
 
 ## 🔧 Technical Details
@@ -105,48 +206,19 @@ rolling_project/
 
 - **Flask**: Web framework for the dashboard
 - **Boto3**: AWS SDK for Python
-- **Botocore**: Core functionality for AWS services
 
-### Application Architecture
+### CI/CD Tools
 
-- **Frontend**: HTML templates with inline styling
-- **Backend**: Flask web server
-- **AWS Integration**: Boto3 SDK for AWS API calls
-- **Data Flow**: Real-time API calls → Data processing → HTML rendering
-
-### Supported AWS Services
-
-1. **EC2 (Elastic Compute Cloud)**
-   - Instance details
-   - Instance states
-   - Public IP addresses
-
-2. **VPC (Virtual Private Cloud)**
-   - VPC IDs
-   - CIDR blocks
-
-3. **ELB (Elastic Load Balancing)**
-   - Load balancer names
-   - DNS names
-
-4. **AMI (Amazon Machine Images)**
-   - Custom AMIs (account-owned only)
-   - AMI names and IDs
-
-## 🌐 Usage
-
-Once the application is running:
-
-1. Navigate to `http://localhost:5001`
-2. View your AWS resources organized in separate tables
-3. Data is fetched in real-time from your AWS account
-4. Refresh the page to update the information
+- **Flake8**: Python code linting
+- **Hadolint**: Dockerfile linting
+- **Bandit**: Python security scanning
+- **Trivy**: Container vulnerability scanning
 
 ## 🔒 Security Considerations
 
 - **Credentials**: Never commit AWS credentials to version control
 - **Permissions**: Use the principle of least privilege for AWS permissions
-- **Network**: Consider running behind a reverse proxy in production
+- **Scanning**: CI/CD pipeline includes security scanning with Bandit and Trivy
 - **Environment**: Use environment variables or AWS IAM roles for credential management
 
 ## 🚨 Troubleshooting
@@ -161,41 +233,26 @@ Once the application is running:
    - Verify your AWS user has the required permissions
    - Check the IAM policy attached to your user/role
 
-3. **Connection Timeout**
-   - Verify your internet connection
-   - Check if AWS region is correctly specified
+3. **Docker Build Fails**
+   - Ensure Docker daemon is running
+   - Check Dockerfile syntax
 
-4. **Application Won't Start**
-   - Ensure all dependencies are installed: `pip install -r requirements.txt`
-   - Check if port 5001 is available
-
-### Debug Mode
-
-The application runs in debug mode by default. For production deployment:
-
-```python
-app.run(host="0.0.0.0", port=5001, debug=False)
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+4. **Jenkins Pipeline Fails**
+   - Verify DockerHub credentials are configured
+   - Check Jenkins has Docker access
 
 ## 📝 License
 
-This project is open source. Please check the license file for details.
+This project is open source.
 
 ## 📞 Support
 
 For issues and questions:
-- Check the troubleshooting section above
-- Review AWS documentation for API limitations
-- Ensure proper AWS credentials and permissions
+
+- Check the [documentation](https://maoridi.github.io/rolling_project/)
+- Review the troubleshooting section
+- Open an issue on GitHub
 
 ---
 
-**Note**: This application makes real AWS API calls and will show actual resources from your AWS account. Ensure you have the proper permissions and understand the costs associated with AWS API calls.
+**Note**: This application makes real AWS API calls and will show actual resources from your AWS account.
