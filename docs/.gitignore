@@ -1,0 +1,18 @@
+# Jekyll build output
+_site/
+
+# Ruby gems
+.bundle/
+vendor/
+Gemfile.lock
+
+# Jekyll cache
+.jekyll-cache/
+.jekyll-metadata
+
+# Sass cache
+.sass-cache/
+
+# OS files
+.DS_Store
+Thumbs.db
