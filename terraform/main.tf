@@ -43,6 +43,14 @@ resource "aws_security_group" "builder_sg" {
     cidr_blocks = [var.my_ip]
   }
 
+  ingress {
+    description = "Port 8080"
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = [var.my_ip]
+  }
+
   egress {
     description = "Allow all outbound traffic"
     from_port   = 0

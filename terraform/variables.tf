@@ -1,7 +1,7 @@
 variable "vpc_id" {
   description = "Existing VPC ID to deploy into"
   type        = string
-  default     = "vpc-0b110d239f1211b4d"
+  default     = "vpc-057d47ed8fe79738e"
 }
 
 variable "ami_id" {
@@ -26,5 +26,5 @@ variable "my_ip" {
 variable "public_subnet_id" {
   description = "Public subnet ID to launch the EC2 instance into"
   type        = string
-  default     = "subnet-0852a4e422a2ea812"
+  default     = "subnet-05f36bfd3e6a5672f"
 }
