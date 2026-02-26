@@ -1,9 +1,42 @@
-services:
-  web:
+version: '3.8'
 
+services:
+
+  web:
+    build:
+      context: ./fe
+      dockerfile: Dockerfile
+    ports:
+      - "5002:5002"
+    depends_on:
+      - backend-service
+    networks:
+      - crypto-network
 
   backend-service:
-
+    build:
+      context: ./be
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    environment:
+      MYSQL_HOST: mysqldb
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 123456
+    depends_on:
+      - mysqldb
+    restart: on-failure
+    networks:
+      - crypto-network
 
   mysqldb:
-      
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: crypto_db
+    networks:
+      - crypto-network
+
+networks:
+  crypto-network:
+    driver: bridge

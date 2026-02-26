@@ -1,0 +1,10 @@
+replicaCount: 2
+
+image:
+  repository: docker-web
+  pullPolicy: Never
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 5002

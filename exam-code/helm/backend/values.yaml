@@ -1,0 +1,15 @@
+replicaCount: 2
+
+image:
+  repository: docker-backend-service
+  pullPolicy: Never
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 5001
+
+database:
+  host: "mysqldb"
+  user: "root"
+  password: "123456"

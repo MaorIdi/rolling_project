@@ -1,0 +1,8 @@
+mysqlRootPassword: "123456"
+mysqlDatabase: "crypto_db"
+serviceName: "mysqldb"
+
+persistence:
+  enabled: true
+  accessMode: ReadWriteOnce
+  size: 1Gi
