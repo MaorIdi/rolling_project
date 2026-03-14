@@ -16,5 +16,8 @@ spec:
       - name: web
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: BACKEND_API_URL
+          value: "{{ .Values.backendApiUrl }}"
         ports:
-        - containerPort: 5002
+        - containerPort: {{ .Values.containerPort }}

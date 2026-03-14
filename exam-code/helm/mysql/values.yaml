@@ -1,8 +1,23 @@
-mysqlRootPassword: "123456"
-mysqlDatabase: "crypto_db"
-serviceName: "mysqldb"
+replicaCount: 1
+
+image:
+  repository: mysql
+  tag: "5.7"
+  pullPolicy: IfNotPresent
+
+service:
+  name: "mysqldb"
+  type: ClusterIP
+  port: 3306
+
+auth:
+  rootPassword: "123456"
+  database: "crypto_db"
+  username: "appuser"
+  password: "123456"
 
 persistence:
   enabled: true
   accessMode: ReadWriteOnce
   size: 1Gi
+  storageClassName: ""

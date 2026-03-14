@@ -2,14 +2,21 @@ replicaCount: 2
 
 image:
   repository: docker-backend-service
-  pullPolicy: Never
+  pullPolicy: IfNotPresent
   tag: "latest"
 
+containerPort: 5001
+
 service:
+  name: backend-service
   type: ClusterIP
   port: 5001
+  targetPort: 5001
 
 database:
   host: "mysqldb"
-  user: "root"
-  password: "123456"
+  port: 3306
+  name: "crypto_db"
+  credentials:
+    user: "appuser"
+    password: "123456"

@@ -5,7 +5,7 @@ metadata:
 spec:
   ports:
   - port: {{ .Values.service.port }}
-    targetPort: 5002
+    targetPort: {{ .Values.service.targetPort }}
   selector:
     app: {{ .Release.Name }}-frontend
   type: {{ .Values.service.type }}

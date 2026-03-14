@@ -15,7 +15,7 @@ spec:
       containers:
       - name: backend-service
         image: docker-backend-service:latest
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5001
         env:

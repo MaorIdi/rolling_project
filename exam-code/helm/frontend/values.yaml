@@ -2,9 +2,14 @@ replicaCount: 2
 
 image:
   repository: docker-web
-  pullPolicy: Never
+  pullPolicy: IfNotPresent
   tag: "latest"
 
+containerPort: 5002
+
 service:
-  type: ClusterIP
+  type: LoadBalancer
   port: 5002
+  targetPort: 5002
+
+backendApiUrl: "http://backend-service:5001/fetch_price"

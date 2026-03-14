@@ -1,32 +1,32 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: web
+  name: frontend
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: web
+      app: frontend
   template:
     metadata:
       labels:
-        app: web
+        app: frontend
     spec:
       containers:
-      - name: web
+      - name: frontend
         image: docker-web:latest
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5002
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: web
+  name: frontend
 spec:
   ports:
   - port: 5002
     targetPort: 5002
   selector:
-    app: web
+    app: frontend
   type: LoadBalancer
